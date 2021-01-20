@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Face Detect Sample</title>
+<meta charset="utf-8">
+</head>
+<style>
+.box{
+  animation: flash 1s linear infinite;
+  width:1200px;
+  height:50px;
+  background:#0091EA;
+  margin:20px;
+  
+    }
+    
+       
+ a[a msg=10]
+    
+    @keyframes flash {
+0%,100% {
+    opacity: 1;
+        }
+    
+  50% {
+    opacity: 0;
+  }
+
+    
+</style>
+<body onload="init()" bgcolor="#fffff0" onLoad="changeColor()">
+  <video id="video" autoplay onloadedmetadata="onPlay()"></video>
+  <p id="message"></p>
+
+  <script src="js/face-api.min.js"></script>
+  <script>
+    const video = document.getElementById("video");
+    const init = async () => {
+
+      // Webカメラ初期化
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: false,
+        video: {
+          width: 400,
+          height: 400
+        }
+      });
+
+      try {
+        video.srcObject = stream;
+      } catch (err) {
+        video.src = window.URL.createObjectURL(stream);
+      }
+      // (1)モデル読み込み　※フォルダを指定
+      await faceapi.nets.tinyFaceDetector.load("models/");
+    }
+
+    const onPlay = () => {
+      const message = document.getElementById('message')
+      const inputSize = 512; // 認識対象のサイズ
+      const scoreThreshold = 0.5; // 数値が高いほど精度が高くなる（〜0.9）
+      // (2)オプション設定
+      const options = new faceapi.TinyFaceDetectorOptions({
+        inputSize,
+        scoreThreshold
+      })
+      const detectInterval = setInterval(async () => {
+        // (3)顔認識処理
+        const result = await faceapi.detectSingleFace(
+          video,
+          options
+        );
+
+        if (result) {
+          message.textContent = "認識されてます"
+          stopShowing();
+            PassSec = 0;
+        } else {
+          message.textContent = "認識されていません"
+        }
+      }, 500);
+    }
+    startShowing();
+    // 繰り返し処理の中身
+function showPassage() {
+   PassSec++;   // カウントアップ
+   var msg = PassSec + "秒が経過しました。";   // 表示文作成    
+   document.getElementById("PassageArea").innerHTML = msg;   // 表示更
+　　setTimeout('document.bgColor="red"',60000);
+}
+
+// 繰り返し処理の開始
+function startShowing() {
+   PassSec = 0;   // カウンタのリセット
+   PassageID = setInterval('showPassage()',1000);   // タイマーをセット(1000ms間隔)
+  
+}
+ 
+// 繰り返し処理の中止
+function stopShowing() {
+   clearInterval( PassageID );   // タイマーのクリア
+   PassageID = setInterval('showPassage()',1000);
+}
+  </script>
+<p id="PassageArea">(ここにカウントが表示されます)</p>    
+    <a msg=10><div class="box"></div></a>
+<nav id="mainNav">
+				<div class="inner">
+					<a class="menu" id="menu"><span>MENU</span></a>
+					<div class="panel">
+						<ul id="topnav">
+							<li><a href="sample.html"><strong2>トップページへ戻る</strong2><br /></a>	
+							</li>
+
+						</ul>
+					</div>
+				</div>
+			</nav>
+<!-- ウェブアプリマニフェストの読み込み -->
+<link rel="manifest" href="manifest.json">
+<!-- ServiceWorkerの登録 -->
+<script>
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js')
+      .then((reg) => {
+        console.log('Service worker registered.', reg);
+      });
+}
+</script>    
+</body>
+
+</html>
